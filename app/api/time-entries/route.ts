@@ -1,7 +1,5 @@
-import {
-    CreateTimeEntryService,
-    getTimeEntries,
-} from '../../../server/services';
+import { getTimeEntries } from '../../../server/services/get-time-entry-service';
+import { CreateTimeEntryService } from '../../../server/services/create-time-entry-service';
 
 export async function POST(req: Request) {
     try {

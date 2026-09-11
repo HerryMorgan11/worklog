@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { use } from "react"
 
 import {
@@ -60,7 +61,7 @@ export function AppSidebar({ user }: { user: Promise<User> }) {
     },
     {
       title: "Pending hours",
-      url: "/pending-hours",
+      url: "/dashboard/pending-hours",
       icon: Clock,
     },
   ]
@@ -92,7 +93,10 @@ export function AppSidebar({ user }: { user: Promise<User> }) {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton tooltip={item.title}>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    render={<Link href={item.url} />}
+                  >
                     <item.icon />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
