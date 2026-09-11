@@ -19,6 +19,8 @@ export const timeEntryStatusEnum = pgEnum("time_entry_status", [
   "ERROR",
 ]);
 
+export type TimeEntryStatus = (typeof timeEntryStatusEnum.enumValues)[number];
+
 export const timeEntries = pgTable(
   "time_entries",
   {
