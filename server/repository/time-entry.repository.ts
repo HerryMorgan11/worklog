@@ -14,6 +14,8 @@ export async function CreateTimeEntry(data: {
             date: data.date,
             hours: data.hours,
             description: data.description,
-        });
+        })
+        .returning();
+
     return entry;
 }
