@@ -1,25 +1,50 @@
-interface Projects {
-    id: number,
-    name: string,
-    description: string
+import "server-only"
+
+export interface Project {
+  id: number
+  name: string
+  description: string
 }
 
-async function GetProjectsRedmine(): Promise<Projects[]> {
+type RedmineProjectsResponse = {
+  projects?: Array<{ id: number; name: string; description?: string | null }>
+  total_count?: number
+}
 
-    const headers: Headers = new Headers()
+const REDMINE_PROJECTS_URL = "https://redmine.hiberus.com/redmine/projects.json"
+const PAGE_SIZE = 100
 
-    headers.set("Content-Type", "application/json")
-    headers.set("Accept", "application/json")
+export async function getProjectsRedmine(): Promise<Project[]> {
+  const apiKey = process.env.REDMINE_API_KEY
+  if (!apiKey) throw new Error("REDMINE_API_KEY no está configurada.")
 
-    headers.set("X-Redmine-API-Key", process.env.REDMINE_API_KEY ?? "")
+  const projects: Project[] = []
+  let offset = 0
+  let totalCount = Infinity
 
-    const response = await fetch('https://redmine.hiberus.com/redmine/projects.json', {
-        method: "GET",
-        headers: headers
-    });
-    
-    if (!response.ok) {
-        throw new Error('No se han podido cargar los proyectos de Redmine');
-    }
-    return (await response.json()).projects;
+  while (offset < totalCount) {
+    const url = new URL(REDMINE_PROJECTS_URL)
+    url.searchParams.set("limit", String(PAGE_SIZE))
+    url.searchParams.set("offset", String(offset))
+
+    const response = await fetch(url, {
+      headers: { Accept: "application/json", "X-Redmine-API-Key": apiKey },
+      cache: "no-store",
+    })
+    if (!response.ok) throw new Error("No se han podido cargar los proyectos de Redmine.")
+
+    const data = (await response.json()) as RedmineProjectsResponse
+    const page = data.projects ?? []
+    projects.push(...page.map((project) => ({
+      id: project.id,
+      name: project.name,
+      description: project.description ?? "",
+    })))
+
+    totalCount = data.total_count ?? projects.length
+    if (page.length === 0) break
+    offset += page.length
+  }
+
+  return projects
 }

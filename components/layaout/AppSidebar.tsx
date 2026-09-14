@@ -59,7 +59,7 @@ export function AppSidebar({ user }: { user: Promise<User> }) {
     },
     {
       title: "Projects",
-      url: "/projects",
+      url: "/dashboard/projects",
       icon: FolderKanban,
     },
     {
