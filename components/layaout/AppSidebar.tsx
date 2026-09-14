@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { use } from "react"
+import { use, useState } from "react"
 import { useClerk } from "@clerk/nextjs"
 
 import {
@@ -38,6 +38,7 @@ import {
   UserRound,
   Plug,
 } from "lucide-react"
+import { RedmineSettingsDialog } from "@/components/redmine-settings-dialog"
 
 type User = {
   name: string
@@ -48,6 +49,7 @@ type User = {
 export function AppSidebar({ user }: { user: Promise<User> }) {
   const { name, email, imageUrl } = use(user)
   const { signOut } = useClerk()
+  const [redmineSettingsOpen, setRedmineSettingsOpen] = useState(false)
 
   const navItems = [
     {
@@ -168,10 +170,10 @@ export function AppSidebar({ user }: { user: Promise<User> }) {
                     <Settings />
                     Settings
                   </DropdownMenuLinkItem>
-                  <DropdownMenuLinkItem href="/settings/redmine">
+                  <DropdownMenuItem onClick={() => setRedmineSettingsOpen(true)}>
                     <Plug />
                     Redmine configuration
-                  </DropdownMenuLinkItem>
+                  </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -187,6 +189,7 @@ export function AppSidebar({ user }: { user: Promise<User> }) {
         </SidebarMenu>
       </SidebarFooter>
       <SidebarRail />
+      <RedmineSettingsDialog open={redmineSettingsOpen} onOpenChange={setRedmineSettingsOpen} />
     </Sidebar>
   )
 }
