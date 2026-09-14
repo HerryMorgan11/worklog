@@ -46,6 +46,8 @@ export const timeEntries = pgTable(
 
     description: text("description"),
 
+    title: text("title"),
+
     status: timeEntryStatusEnum("status")
       .default("DRAFT")
       .notNull(),

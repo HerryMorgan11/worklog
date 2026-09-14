@@ -5,6 +5,8 @@ export async function CreateTimeEntryService(data: {
     date: string;
     hours: number;
     description?: string;
+    title?: string;
+    redmineProjectId?: number;
 }){
     if (data.hours <= 0) {
         throw new Error('Hours must be greater than 0');
@@ -15,5 +17,7 @@ export async function CreateTimeEntryService(data: {
        date: data.date,
        hours: data.hours,
        description: data.description,
+       title: data.title,
+       redmineProjectId: data.redmineProjectId,
    });
 }
