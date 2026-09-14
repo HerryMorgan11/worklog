@@ -1,6 +1,11 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 
-const publicRoutes = ["/sign-in", "/sign-up", "/__clerk"];
+const publicRoutes = [
+  "/sign-in",
+  "/sign-up",
+  "/__clerk",
+  "/api/time-entries",
+];
 
 export default clerkMiddleware(
   async (auth, request) => {
@@ -8,11 +13,7 @@ export default clerkMiddleware(
     const isPublicRoute = publicRoutes.some(
       (route) => pathname === route || pathname.startsWith(`${route}/`),
     );
-    const isTimeEntriesApi = pathname === "/api/time-entries";
-
-    if (isTimeEntriesApi) {
-      await auth.protect({ token: ["session_token", "api_key"] });
-    } else if (!isPublicRoute) {
+    if (!isPublicRoute) {
       await auth.protect();
     }
   },
