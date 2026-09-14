@@ -2,11 +2,19 @@ import { auth } from "@clerk/nextjs/server";
 import { getTimeEntries } from "@/server/services/get-time-entry-service";
 import { CreateTimeEntryService } from "@/server/services/create-time-entry-service";
 import { getUserByClerkUserId } from "@/server/repository/create-user.repository";
+import { assignTimeEntryIssue } from "@/server/services/assign-time-entry-issue-service";
 
 type CreateTimeEntryRequest = {
   date?: unknown;
   hours?: unknown;
   description?: unknown;
+  title?: unknown;
+  redmineProjectId?: unknown;
+};
+
+type AssignIssueRequest = {
+  id?: unknown;
+  redmineIssueId?: unknown;
 };
 
 async function getAuthenticatedUser() {
@@ -41,7 +49,9 @@ export async function POST(req: Request) {
       !/^\d{4}-\d{2}-\d{2}$/.test(body.date) ||
       typeof body.hours !== "number" ||
       !Number.isFinite(body.hours) ||
-      (body.description !== undefined && typeof body.description !== "string")
+      (body.description !== undefined && typeof body.description !== "string") ||
+      (body.title !== undefined && typeof body.title !== "string") ||
+      (body.redmineProjectId !== undefined && (typeof body.redmineProjectId !== "number" || !Number.isSafeInteger(body.redmineProjectId) || body.redmineProjectId <= 0))
     ) {
       return Response.json({ error: "Invalid request body" }, { status: 400 });
     }
@@ -51,6 +61,8 @@ export async function POST(req: Request) {
       date: body.date,
       hours: body.hours,
       description: body.description,
+      title: body.title,
+      redmineProjectId: body.redmineProjectId,
     });
 
     return Response.json(timeEntry, { status: 201 });
@@ -85,4 +97,29 @@ export async function GET(request: Request) {
   });
 
   return Response.json(entries);
+}
+
+export async function PATCH(req: Request) {
+  const user = await getAuthenticatedUser();
+  if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
+
+  try {
+    const body: AssignIssueRequest = await req.json();
+    if (
+      typeof body.id !== "string" ||
+      typeof body.redmineIssueId !== "number" ||
+      !Number.isSafeInteger(body.redmineIssueId) ||
+      body.redmineIssueId <= 0
+    ) {
+      return Response.json({ error: "Invalid request body" }, { status: 400 });
+    }
+
+    return Response.json(await assignTimeEntryIssue({
+      userId: user.id,
+      timeEntryId: body.id,
+      redmineIssueId: body.redmineIssueId,
+    }));
+  } catch (error) {
+    return Response.json({ error: (error as Error).message }, { status: 400 });
+  }
 }
