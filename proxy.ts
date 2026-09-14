@@ -5,6 +5,7 @@ const publicRoutes = [
   "/sign-up",
   "/__clerk",
   "/api/time-entries",
+  "/api/redmine",
 ];
 
 export default clerkMiddleware(
