@@ -1,11 +1,4 @@
 import {
-  boolean,
-  date,
-  index,
-  integer,
-  jsonb,
-  numeric,
-  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -13,7 +6,6 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-
 
 export const users = pgTable(
   "users",
@@ -52,3 +44,6 @@ export const users = pgTable(
     uniqueIndex("users_clerk_user_id_idx").on(table.clerkUserId),
   ],
 );
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;

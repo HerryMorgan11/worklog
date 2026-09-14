@@ -41,13 +41,12 @@ import {
 
 type User = {
   name: string
-  lastName: string
   email: string
   imageUrl: string
 }
 
 export function AppSidebar({ user }: { user: Promise<User> }) {
-  const { name, lastName, email, imageUrl } = use(user)
+  const { name, email, imageUrl } = use(user)
   const { signOut } = useClerk()
 
   const navItems = [
@@ -117,19 +116,19 @@ export function AppSidebar({ user }: { user: Promise<User> }) {
                 render={
                   <SidebarMenuButton
                     size="lg"
-                    tooltip={`${name} ${lastName}`}
+                    tooltip={name}
                   />
                 }
               >
                 <Avatar className="size-8 rounded-lg">
-                  <AvatarImage src={imageUrl} alt={`${name} ${lastName}`} />
+                <AvatarImage src={imageUrl} alt={name} />
                   <AvatarFallback className="rounded-lg">
                     {name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
-                    {name} {lastName}
+                    {name}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
                     {email}
@@ -145,14 +144,14 @@ export function AppSidebar({ user }: { user: Promise<User> }) {
               >
                 <div className="flex items-center gap-2 px-2 py-1.5 text-left text-sm">
                   <Avatar className="size-8 rounded-lg">
-                    <AvatarImage src={imageUrl} alt={`${name} ${lastName}`} />
+                    <AvatarImage src={imageUrl} alt={name} />
                     <AvatarFallback className="rounded-lg">
                       {name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-semibold">
-                      {name} {lastName}
+                      {name}
                     </span>
                     <span className="truncate text-xs text-muted-foreground">
                       {email}
