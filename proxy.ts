@@ -8,8 +8,11 @@ export default clerkMiddleware(
     const isPublicRoute = publicRoutes.some(
       (route) => pathname === route || pathname.startsWith(`${route}/`),
     );
+    const isTimeEntriesApi = pathname === "/api/time-entries";
 
-    if (!isPublicRoute) {
+    if (isTimeEntriesApi) {
+      await auth.protect({ token: ["session_token", "api_key"] });
+    } else if (!isPublicRoute) {
       await auth.protect();
     }
   },
