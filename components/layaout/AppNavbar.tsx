@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { use } from "react"
+import { useClerk } from "@clerk/nextjs"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -49,6 +50,7 @@ export function ThemeToggle() {
 
 export function AppNavbar({ user }: { user: Promise<User> }) {
   const { name, lastName, email, imageUrl } = use(user)
+  const { signOut } = useClerk()
 
   return (
     <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b bg-background px-4">
@@ -87,9 +89,12 @@ export function AppNavbar({ user }: { user: Promise<User> }) {
                 </span>
               </div>
             </div>
-            <DropdownMenuItem variant="destructive">
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => void signOut({ redirectUrl: "/sign-in" })}
+            >
               <LogOut />
-              Log out
+              Cerrar sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

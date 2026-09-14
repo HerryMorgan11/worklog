@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { use } from "react"
+import { useClerk } from "@clerk/nextjs"
 
 import {
   Sidebar,
@@ -47,6 +48,7 @@ type User = {
 
 export function AppSidebar({ user }: { user: Promise<User> }) {
   const { name, lastName, email, imageUrl } = use(user)
+  const { signOut } = useClerk()
 
   const navItems = [
     {
@@ -173,9 +175,12 @@ export function AppSidebar({ user }: { user: Promise<User> }) {
                   </DropdownMenuLinkItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive">
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => void signOut({ redirectUrl: "/sign-in" })}
+                >
                   <LogOut />
-                  Log out
+                  Cerrar sesión
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
