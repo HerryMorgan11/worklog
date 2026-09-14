@@ -9,6 +9,7 @@ type CreateTimeEntryRequest = {
   hours?: unknown;
   description?: unknown;
   title?: unknown;
+  projectId?: unknown;
   redmineProjectId?: unknown;
 };
 
@@ -16,6 +17,36 @@ type AssignIssueRequest = {
   id?: unknown;
   redmineIssueId?: unknown;
 };
+
+function parseProjectId(value: unknown): number | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (typeof value === "number") {
+    if (Number.isSafeInteger(value) && value > 0) {
+      return value;
+    }
+
+    throw new Error("El ID del proyecto no es válido.");
+  }
+
+  if (typeof value !== "string") {
+    throw new Error("El proyecto debe tener el formato 'ID | Nombre del proyecto'.");
+  }
+
+  const id = value.split("|", 1)[0]?.trim();
+  if (!id || !/^\d+$/.test(id)) {
+    throw new Error("El proyecto debe tener el formato 'ID | Nombre del proyecto'.");
+  }
+
+  const projectId = Number(id);
+  if (!Number.isSafeInteger(projectId) || projectId <= 0) {
+    throw new Error("El ID del proyecto no es válido.");
+  }
+
+  return projectId;
+}
 
 async function getAuthenticatedUser() {
   const authObject = await auth({
@@ -43,6 +74,9 @@ export async function POST(req: Request) {
 
   try {
     const body: CreateTimeEntryRequest = await req.json();
+    const redmineProjectId = parseProjectId(
+      body.projectId ?? body.redmineProjectId,
+    );
 
     if (
       typeof body.date !== "string" ||
@@ -50,8 +84,7 @@ export async function POST(req: Request) {
       typeof body.hours !== "number" ||
       !Number.isFinite(body.hours) ||
       (body.description !== undefined && typeof body.description !== "string") ||
-      (body.title !== undefined && typeof body.title !== "string") ||
-      (body.redmineProjectId !== undefined && (typeof body.redmineProjectId !== "number" || !Number.isSafeInteger(body.redmineProjectId) || body.redmineProjectId <= 0))
+      (body.title !== undefined && typeof body.title !== "string")
     ) {
       return Response.json({ error: "Invalid request body" }, { status: 400 });
     }
@@ -62,7 +95,7 @@ export async function POST(req: Request) {
       hours: body.hours,
       description: body.description,
       title: body.title,
-      redmineProjectId: body.redmineProjectId,
+      redmineProjectId,
     });
 
     return Response.json(timeEntry, { status: 201 });
